@@ -120,14 +120,12 @@ function render(ideas, stats) {
   const withMin = ideas.filter(i => i.minutes != null && i.minutes > 0);
   const weightedDailyMin = withMin.reduce((s, i) => s + i.minutes * Math.max(1, i.votes || 1), 0);
   const weightedHours = Math.round(weightedDailyMin / 60);
-  const cities = Math.max(stats.participant_cities || 0, stats.idea_cities || 0);
 
   const cards = `
     <div class="cards">
       <div class="card"><div class="num">${ideas.length}</div><div class="lab">Toplam geri bildirim</div></div>
       <div class="card"><div class="num">${totalVotes}</div><div class="lab">Toplam oy</div></div>
       <div class="card"><div class="num">${stats.participants || 0}</div><div class="lab">Katılımcı hekim</div></div>
-      <div class="card"><div class="num">${cities}</div><div class="lab">Farklı il</div></div>
       <div class="card hl"><div class="num">~${weightedHours.toLocaleString('tr-TR')} sa</div><div class="lab">Oyla ağırlıklı toplam günlük zaman kaybı</div></div>
     </div>`;
 
@@ -173,7 +171,7 @@ function render(ideas, stats) {
 }
 
 function toCSV(rows) {
-  const cols = ['id','category','module','votes','minutes','bransh','il','gecis','created_at','text'];
+  const cols = ['id','category','module','votes','minutes','bransh','gecis','created_at','text'];
   const head = cols.join(',');
   const esc = (v) => { v = (v == null ? '' : String(v)); return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const body = rows.map(r => cols.map(c => esc(r[c])).join(',')).join('\n');

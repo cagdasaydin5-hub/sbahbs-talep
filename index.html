@@ -164,8 +164,6 @@
     <p>Geri bildirimler SB-AHBS proje yönetimine sunulurken "kaç ilden, hangi branştan ve ne kadar deneyimli hekimler" diyebilmemiz için 3 kısa soru — yalnızca 1 kez, hepsi tek tık.</p>
     <label>Branş / görev</label>
     <div class="cat-pick" id="pf-bransh-pick"></div>
-    <label for="pf-il">İl</label>
-    <select id="pf-il"></select>
     <label>SB-AHBS'ye ne zaman geçtiniz?</label>
     <div class="cat-pick" id="pf-gecis-pick"></div>
     <div class="modal-actions">
@@ -241,7 +239,7 @@ async function addIdea() {
       p_module: $('moduleSel').value || null,
       p_minutes: (mins != null && !isNaN(mins)) ? mins : null,
       p_bransh: profile ? profile.bransh : null,
-      p_il: profile ? profile.il : null,
+      p_il: null,
       p_gecis: profile ? profile.gecis : null,
     });
     ideas.push(item);
@@ -350,23 +348,21 @@ function renderChips(cid, items, sel, onPick) {
     `<span class="cat-opt ${x === sel ? 'sel' : ''}" data-v="${esc(x)}" style="${x === sel ? 'background:var(--accent-light);border-color:var(--accent-border);color:#93b4f7' : ''}">${esc(x)}</span>`).join('');
   document.querySelectorAll('#' + cid + ' .cat-opt').forEach(el => el.onclick = () => onPick(el.dataset.v));
 }
-function updateSaveBtn() { $('pf-save').disabled = !(pfBransh && $('pf-il').value && pfGecis); }
+function updateSaveBtn() { $('pf-save').disabled = !(pfBransh && pfGecis); }
 function renderBranshChips() { renderChips('pf-bransh-pick', BRANSLAR, pfBransh, v => { pfBransh = (pfBransh === v ? '' : v); renderBranshChips(); updateSaveBtn(); }); }
 function renderGecisChips()  { renderChips('pf-gecis-pick',  GECIS,    pfGecis,  v => { pfGecis  = (pfGecis  === v ? '' : v); renderGecisChips();  updateSaveBtn(); }); }
 function openProfile() {
-  fillSelect($('pf-il'), ILLER, 'Seçin...');
   pfBransh = profile ? (profile.bransh || '') : '';
   pfGecis  = profile ? (profile.gecis  || '') : '';
-  if (profile) $('pf-il').value = profile.il || '';
   renderBranshChips(); renderGecisChips(); updateSaveBtn();
   $('profileModal').classList.add('show');
 }
 function closeProfile() { $('profileModal').classList.remove('show'); }
 async function saveProfile() {
-  profile = { bransh: pfBransh, il: $('pf-il').value || '', gecis: pfGecis };
+  profile = { bransh: pfBransh, gecis: pfGecis };
   localStorage.setItem('sbahbs_profile', JSON.stringify(profile));
   closeProfile();
-  try { await rpc('register_participant', { p_client_id: clientId, p_bransh: profile.bransh, p_il: profile.il, p_gecis: profile.gecis }); } catch (e) {}
+  try { await rpc('register_participant', { p_client_id: clientId, p_bransh: profile.bransh, p_il: null, p_gecis: profile.gecis }); } catch (e) {}
 }
 
 // ---- başlat ----
@@ -376,7 +372,6 @@ $('addBtn').onclick = addIdea;
 $('newIdea').addEventListener('input', e => $('cc').textContent = e.target.value.length);
 $('newIdea').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea(); });
 $('pf-save').onclick = saveProfile;
-$('pf-il').addEventListener('change', updateSaveBtn);
 
 // profil yoksa zorunlu olarak sor (atlanamaz; üçü de seçilmeden başlanmaz)
 if (!profile) openProfile();
