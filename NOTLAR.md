@@ -3,9 +3,12 @@
 Tek dosyalık statik site (HTML+CSS+JS). Sunucu/derleme gerekmez.
 
 ## Dosyalar
-- `index.html` — sitenin kendisi (kategorili, güvenli sürüm)
-- `setup.sql` — yeni Supabase projesinde bir kez çalıştırılacak kurulum
+- `index.html` — doktorların kullandığı geri bildirim sayfası (kategori + modül + zaman kaybı + tek seferlik branş/il)
+- `panel.html` — yönetici/sonuç paneli (özet kartlar, kategori/modül dağılımı, top 10, zaman kaybı, CSV dışa aktarma)
+- `setup.sql` — Supabase kurulum/güncelleme (v2: module/minutes/bransh/il kolonları, participants tablosu, add_idea/vote_idea/register_participant/get_stats)
 - `index.original-backup.html` — Netlify'dan kurtarılan ESKİ sürümün yedeği
+
+> NOT: `index.html` veya `panel.html` deploy edilirken **ikisi birlikte** yüklenmeli (panel.html linki index'te var).
 
 ## Kullanılan Supabase projesi
 - **Proje:** `vbobeqgambooxtfefxmd` (hesapta zaten mevcut, e-Derslik'ten ayrı proje)

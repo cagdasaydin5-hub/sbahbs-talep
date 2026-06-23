@@ -20,114 +20,122 @@
   }
   .container { max-width: 720px; margin: 0 auto; }
 
-  .page-header { margin-bottom: 1.75rem; }
+  .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 1.75rem; }
   .page-header h1 { font-size: 23px; font-weight: 650; letter-spacing: -0.4px; }
-  .page-header p { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.65; }
-
-  .add-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;
+  .page-header p { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.65; max-width: 560px; }
+  .panel-link {
+    flex-shrink: 0; font-size: 13px; color: var(--muted); text-decoration: none;
+    border: 1px solid var(--border); border-radius: 20px; padding: 7px 14px; white-space: nowrap;
+    transition: all .12s;
   }
+  .panel-link:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .add-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
   .add-card .lbl { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 9px; }
+  .add-card .lbl .opt { font-weight: 400; opacity: .7; }
+  .row2 { display: flex; gap: 12px; margin-bottom: 14px; }
+  .row2 > div { flex: 1; min-width: 0; }
 
   .cat-pick { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
-  .cat-opt {
-    font-size: 13px; padding: 7px 13px; border-radius: 20px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
-    transition: all .12s ease; user-select: none;
-  }
+  .cat-opt { font-size: 13px; padding: 7px 13px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--muted); transition: all .12s ease; user-select: none; }
   .cat-opt:hover { border-color: var(--border-hover); }
   .cat-opt.sel { color: #fff; font-weight: 500; }
 
-  textarea#newIdea {
+  select, input[type=number] {
     width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 12px 14px; font-size: 14.5px; background: var(--bg); color: var(--text);
-    outline: none; resize: vertical; min-height: 78px; line-height: 1.55;
-    font-family: inherit;
+    padding: 10px 12px; font-size: 14px; background: var(--bg); color: var(--text);
+    outline: none; font-family: inherit;
   }
+  select:focus, input[type=number]:focus { border-color: var(--accent); }
+
+  textarea#newIdea { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14.5px; background: var(--bg); color: var(--text); outline: none; resize: vertical; min-height: 78px; line-height: 1.55; font-family: inherit; }
   textarea#newIdea:focus { border-color: var(--accent); }
   .add-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 12px; }
   .char-count { font-size: 12px; color: var(--muted); }
-  #addBtn {
-    background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm);
-    padding: 11px 22px; font-size: 14px; font-weight: 550; cursor: pointer; white-space: nowrap;
-    transition: opacity .12s;
-  }
+  #addBtn { background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px 22px; font-size: 14px; font-weight: 550; cursor: pointer; white-space: nowrap; transition: opacity .12s; }
   #addBtn:hover { opacity: .9; }
   #addBtn:disabled { opacity: .45; cursor: not-allowed; }
 
-  .toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-bottom: 1rem; flex-wrap: wrap;
-  }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1rem; flex-wrap: wrap; }
   .filters { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip {
-    font-size: 12.5px; padding: 6px 13px; border-radius: 20px; cursor: pointer;
-    border: 1px solid var(--border); background: none; color: var(--muted); transition: all .12s;
-  }
+  .chip { font-size: 12.5px; padding: 6px 13px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: none; color: var(--muted); transition: all .12s; }
   .chip:hover { border-color: var(--border-hover); }
   .chip.active { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
   .chip .n { opacity: .6; margin-left: 3px; }
-
   .sort { display: flex; gap: 6px; align-items: center; }
   .sort span { font-size: 12.5px; color: var(--muted); }
-  .sort-btn {
-    font-size: 12.5px; padding: 6px 12px; border-radius: 20px; cursor: pointer;
-    border: 1px solid var(--border); background: none; color: var(--muted);
-  }
+  .sort-btn { font-size: 12.5px; padding: 6px 12px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: none; color: var(--muted); }
   .sort-btn.active { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
 
   .list { display: flex; flex-direction: column; gap: 9px; }
-  .item {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1rem 1.15rem; display: flex; align-items: flex-start; gap: 14px;
-    transition: border-color .12s;
-  }
+  .item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.15rem; display: flex; align-items: flex-start; gap: 14px; transition: border-color .12s; }
   .item:hover { border-color: var(--border-hover); }
   .vote-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 1px; }
-  .vote-btn {
-    background: none; border: 1px solid var(--border); border-radius: 8px;
-    width: 38px; height: 32px; cursor: pointer; color: var(--muted); font-size: 14px;
-    transition: all .12s;
-  }
+  .vote-btn { background: none; border: 1px solid var(--border); border-radius: 8px; width: 38px; height: 32px; cursor: pointer; color: var(--muted); font-size: 14px; transition: all .12s; }
   .vote-btn:hover { border-color: var(--border-hover); color: var(--text); }
   .vote-btn.voted { background: var(--accent-light); border-color: var(--accent-border); color: #93b4f7; }
   .vote-count { font-size: 15px; font-weight: 650; color: var(--text); min-width: 22px; text-align: center; }
   .item-body { flex: 1; min-width: 0; }
   .item-text { font-size: 14.5px; color: var(--text); line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; }
-  .item-meta { display: flex; align-items: center; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
-  .cat-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 550; border: 1px solid; }
+  .item-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 550; border: 1px solid; }
+  .badge.module { color: var(--muted); background: var(--surface-2); border-color: var(--border); }
+  .badge.mins { color: #d6b25a; background: #2c2410; border-color: #5a4a1e; }
   .time { font-size: 12px; color: var(--muted); }
 
   .status { text-align: center; color: var(--muted); font-size: 14px; padding: 3rem 1rem; line-height: 1.6; }
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(90px);
-    background: #f0ede8; color: #141412; font-size: 13px; font-weight: 500;
-    padding: 11px 20px; border-radius: 9px; transition: transform .25s ease; z-index: 999;
-    box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(90px); background: #f0ede8; color: #141412; font-size: 13px; font-weight: 500; padding: 11px 20px; border-radius: 9px; transition: transform .25s ease; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.err { background: #4a1f1f; color: #ffd9d9; }
+
+  /* profil modalı */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+  .overlay.show { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; max-width: 420px; width: 100%; }
+  .modal h2 { font-size: 18px; font-weight: 600; }
+  .modal p { font-size: 13.5px; color: var(--muted); margin: 8px 0 18px; line-height: 1.55; }
+  .modal label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 7px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .modal-actions button { flex: 1; border-radius: var(--radius-sm); padding: 11px; font-size: 14px; font-weight: 550; cursor: pointer; border: 1px solid var(--border); }
+  .modal-actions .ghost { background: none; color: var(--muted); }
+  .modal-actions .ghost:hover { border-color: var(--border-hover); color: var(--text); }
+  .modal-actions .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   @media (max-width: 560px) {
     body { padding: 1.25rem .85rem 3rem; }
     .toolbar { flex-direction: column; align-items: stretch; }
     .add-foot { flex-direction: column; align-items: stretch; }
+    .row2 { flex-direction: column; gap: 14px; }
     #addBtn { width: 100%; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="page-header">
-    <h1>SBAHBS Geri Bildirim</h1>
-    <p>SB-AHBS'de geliştirilmesini istediğin, kullanırken zorlandığın ya da hatalı bulduğun şeyleri yaz.
-       Aynı görüşü paylaşıyorsan oy ver — en çok oy alanlar önceliklendirilip ilgili birime iletilecek.</p>
+  <div class="topbar">
+    <div class="page-header">
+      <h1>SBAHBS Geri Bildirim</h1>
+      <p>SB-AHBS'de geliştirilmesini istediğin, kullanırken zorlandığın ya da hatalı bulduğun şeyleri yaz.
+         Aynı görüşe oy ver — en çok oy alanlar önceliklendirilip ilgili birime iletilecek.</p>
+    </div>
+    <a class="panel-link" href="panel.html">📊 Sonuçlar</a>
   </div>
 
   <div class="add-card">
     <span class="lbl">Geri bildirim türü</span>
     <div class="cat-pick" id="catPick"></div>
+
+    <div class="row2">
+      <div>
+        <span class="lbl">İlgili modül / ekran <span class="opt">(opsiyonel)</span></span>
+        <select id="moduleSel"></select>
+      </div>
+      <div>
+        <span class="lbl">Günde ~kaç dk uğraştırıyor? <span class="opt">(opsiyonel)</span></span>
+        <input type="number" id="minutesInp" min="0" max="600" placeholder="örn. 15">
+      </div>
+    </div>
+
     <span class="lbl">Geri bildirimin</span>
     <textarea id="newIdea" maxlength="500" placeholder="Örn: Hasta adı veya TC yazmaya başlayınca arama otomatik daralsın, Enter'a basmaya gerek kalmasın (en az 3 hane)..."></textarea>
     <div class="add-foot">
@@ -147,15 +155,31 @@
 
   <div class="list" id="list"><div class="status">Yükleniyor...</div></div>
 </div>
+
+<!-- tek seferlik profil modalı -->
+<div class="overlay" id="profileModal">
+  <div class="modal">
+    <h2>Hoş geldin 👋</h2>
+    <p>Geri bildirimleri SB-AHBS proje yönetimine sunarken "kaç ilden, hangi branştan hekim" diyebilmemiz için iki kısa soru — yalnızca 1 kez.</p>
+    <label for="pf-bransh">Branş / görev</label>
+    <select id="pf-bransh"></select>
+    <label for="pf-il">İl</label>
+    <select id="pf-il"></select>
+    <div class="modal-actions">
+      <button class="ghost" id="pf-skip">Atla</button>
+      <button class="primary" id="pf-save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ====== AYAR: yeni Supabase projesinin bilgileri buraya ======
+// ====== AYAR: Supabase ======
 const SUPABASE_URL = 'https://vbobeqgambooxtfefxmd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZib2JlcWdhbWJvb3h0ZmVmeG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjY4MjUsImV4cCI6MjA5MzY0MjgyNX0.-JAFm0N2NrEcS9qX-S6t0lx0att63agcR_wWrio6sOE';
-// =============================================================
 
-// Kategoriler (gerekirse sadece buradan düzenle)
+// Kategoriler (tek yerden düzenlenir)
 const CATEGORIES = [
   { label: 'Kolaylaştırılmalı',  color: '#3b82f6', bg: '#1e2d4a' },
   { label: 'Yavaş / Performans', color: '#f59e0b', bg: '#3a2e12' },
@@ -165,8 +189,14 @@ const CATEGORIES = [
 ];
 const catOf = (l) => CATEGORIES.find(c => c.label === l) || CATEGORIES[0];
 
+const MODULES = ['Hasta Arama / Kayıt','Reçete / İlaç','Tahlil / Sonuç','Muayene / Tanı','Sevk','Rapor','Aşı / İzlem','Randevu','e-Nabız / MEDULA','Diğer'];
+const BRANSLAR = ['Aile Hekimi','Aile Sağlığı Çalışanı (ebe/hemşire)','Uzman Hekim','Pratisyen Hekim','Diğer'];
+const ILLER = ['Adana','Adıyaman','Afyonkarahisar','Ağrı','Aksaray','Amasya','Ankara','Antalya','Ardahan','Artvin','Aydın','Balıkesir','Bartın','Batman','Bayburt','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkari','Hatay','Iğdır','Isparta','İstanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kırıkkale','Kırklareli','Kırşehir','Kilis','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Siirt','Sinop','Sivas','Şanlıurfa','Şırnak','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak'];
+
 let ideas = [];
 let myVotes = JSON.parse(localStorage.getItem('sbahbs_votes') || '{}');
+let profile = JSON.parse(localStorage.getItem('sbahbs_profile') || 'null'); // {bransh, il}
+let clientId = localStorage.getItem('sbahbs_cid');
 let sortMode = 'votes';
 let filterCat = 'all';
 let selectedCat = CATEGORIES[0].label;
@@ -175,53 +205,48 @@ let sending = false;
 const $ = (id) => document.getElementById(id);
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-const baseHeaders = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY,
-  'Content-Type': 'application/json',
-};
+if (!clientId) { clientId = 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); localStorage.setItem('sbahbs_cid', clientId); }
 
+const baseHeaders = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
 async function getIdeas() {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/ideas?select=*`, { headers: baseHeaders });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function rpc(fn, body) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
-    method: 'POST', headers: baseHeaders, body: JSON.stringify(body),
-  });
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: baseHeaders, body: JSON.stringify(body) });
   if (!r.ok) throw new Error(await r.text());
-  return r.json();
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
 }
 
 async function load() {
-  try {
-    ideas = await getIdeas();
-    render();
-  } catch (e) {
-    $('list').innerHTML = '<div class="status">Bağlantı hatası. Lütfen sayfayı yenileyin.</div>';
-  }
+  try { ideas = await getIdeas(); render(); }
+  catch (e) { $('list').innerHTML = '<div class="status">Bağlantı hatası. Lütfen sayfayı yenileyin.</div>'; }
 }
 
 async function addIdea() {
   if (sending) return;
-  const inp = $('newIdea');
-  const text = inp.value.trim();
+  const text = $('newIdea').value.trim();
   if (text.length < 3) { showToast('Lütfen biraz daha açıklayıcı yaz', true); return; }
+  const mins = $('minutesInp').value ? parseInt($('minutesInp').value, 10) : null;
   sending = true; $('addBtn').disabled = true;
   try {
-    const item = await rpc('add_idea', { p_text: text, p_category: selectedCat });
+    const item = await rpc('add_idea', {
+      p_text: text,
+      p_category: selectedCat,
+      p_module: $('moduleSel').value || null,
+      p_minutes: (mins != null && !isNaN(mins)) ? mins : null,
+      p_bransh: profile ? profile.bransh : null,
+      p_il: profile ? profile.il : null,
+    });
     ideas.push(item);
-    myVotes[item.id] = true;
-    saveVotes();
-    inp.value = ''; $('cc').textContent = '0';
+    myVotes[item.id] = true; saveVotes();
+    $('newIdea').value = ''; $('cc').textContent = '0'; $('minutesInp').value = ''; $('moduleSel').value = '';
     render();
     showToast('Teşekkürler, gönderildi!');
-  } catch (e) {
-    showToast('Gönderilemedi, tekrar deneyin', true);
-  } finally {
-    sending = false; $('addBtn').disabled = false;
-  }
+  } catch (e) { showToast('Gönderilemedi, tekrar deneyin', true); }
+  finally { sending = false; $('addBtn').disabled = false; }
 }
 
 async function vote(id) {
@@ -229,15 +254,13 @@ async function vote(id) {
   if (!item) return;
   const wasVoted = !!myVotes[id];
   const delta = wasVoted ? -1 : 1;
-  // iyimser güncelle
   item.votes = Math.max(0, item.votes + delta);
   if (wasVoted) delete myVotes[id]; else myVotes[id] = true;
   saveVotes(); render();
   try {
-    const newVotes = await rpc('vote_idea', { p_id: id, p_delta: delta });
-    if (typeof newVotes === 'number') { item.votes = newVotes; render(); }
+    const nv = await rpc('vote_idea', { p_id: id, p_delta: delta });
+    if (typeof nv === 'number') { item.votes = nv; render(); }
   } catch (e) {
-    // geri al
     item.votes = Math.max(0, item.votes - delta);
     if (wasVoted) myVotes[id] = true; else delete myVotes[id];
     saveVotes(); render(); showToast('Oy kaydedilemedi', true);
@@ -263,39 +286,31 @@ function timeAgo(iso) {
 
 function renderCatPick() {
   $('catPick').innerHTML = CATEGORIES.map(c =>
-    `<span class="cat-opt ${c.label === selectedCat ? 'sel' : ''}"
-       data-cat="${esc(c.label)}"
-       style="${c.label === selectedCat ? `background:${c.bg};border-color:${c.color};color:${c.color}` : ''}">
-       ${esc(c.label)}</span>`).join('');
-  document.querySelectorAll('#catPick .cat-opt').forEach(el =>
-    el.onclick = () => { selectedCat = el.dataset.cat; renderCatPick(); });
+    `<span class="cat-opt ${c.label === selectedCat ? 'sel' : ''}" data-cat="${esc(c.label)}"
+       style="${c.label === selectedCat ? `background:${c.bg};border-color:${c.color};color:${c.color}` : ''}">${esc(c.label)}</span>`).join('');
+  document.querySelectorAll('#catPick .cat-opt').forEach(el => el.onclick = () => { selectedCat = el.dataset.cat; renderCatPick(); });
 }
 
 function renderFilters() {
   const counts = {};
   ideas.forEach(i => counts[i.category] = (counts[i.category] || 0) + 1);
   const all = `<button class="chip ${filterCat === 'all' ? 'active' : ''}" data-f="all">Tümü <span class="n">${ideas.length}</span></button>`;
-  const rest = CATEGORIES.map(c =>
-    `<button class="chip ${filterCat === c.label ? 'active' : ''}" data-f="${esc(c.label)}">${esc(c.label)} <span class="n">${counts[c.label] || 0}</span></button>`).join('');
+  const rest = CATEGORIES.map(c => `<button class="chip ${filterCat === c.label ? 'active' : ''}" data-f="${esc(c.label)}">${esc(c.label)} <span class="n">${counts[c.label] || 0}</span></button>`).join('');
   $('filters').innerHTML = all + rest;
-  document.querySelectorAll('#filters .chip').forEach(el =>
-    el.onclick = () => { filterCat = el.dataset.f; render(); });
+  document.querySelectorAll('#filters .chip').forEach(el => el.onclick = () => { filterCat = el.dataset.f; render(); });
 }
 
 function render() {
-  renderCatPick();
-  renderFilters();
+  renderCatPick(); renderFilters();
   $('sb-votes').className = 'sort-btn' + (sortMode === 'votes' ? ' active' : '');
   $('sb-new').className = 'sort-btn' + (sortMode === 'new' ? ' active' : '');
-
   const list = $('list');
   const arr = visibleIdeas();
-  if (!arr.length) {
-    list.innerHTML = '<div class="status">Bu kategoride henüz geri bildirim yok.<br>İlk yazan sen ol 👆</div>';
-    return;
-  }
+  if (!arr.length) { list.innerHTML = '<div class="status">Bu kategoride henüz geri bildirim yok.<br>İlk yazan sen ol 👆</div>'; return; }
   list.innerHTML = arr.map(item => {
     const c = catOf(item.category);
+    const modBadge = item.module ? `<span class="badge module">${esc(item.module)}</span>` : '';
+    const minBadge = (item.minutes != null && item.minutes > 0) ? `<span class="badge mins">~${item.minutes} dk/gün</span>` : '';
     return `
     <div class="item">
       <div class="vote-col">
@@ -305,33 +320,52 @@ function render() {
       <div class="item-body">
         <div class="item-text">${esc(item.text)}</div>
         <div class="item-meta">
-          <span class="cat-badge" style="color:${c.color};background:${c.bg};border-color:${c.color}">${esc(item.category)}</span>
+          <span class="badge" style="color:${c.color};background:${c.bg};border-color:${c.color}">${esc(item.category)}</span>
+          ${modBadge}${minBadge}
           <span class="time">${timeAgo(item.created_at)}</span>
         </div>
       </div>
     </div>`;
   }).join('');
-  document.querySelectorAll('.vote-btn').forEach(el =>
-    el.onclick = () => vote(Number(el.dataset.id)));
+  document.querySelectorAll('.vote-btn').forEach(el => el.onclick = () => vote(Number(el.dataset.id)));
 }
 
 let toastT;
 function showToast(msg, isErr) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (isErr ? ' err' : '');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => t.className = 'toast' + (isErr ? ' err' : ''), 2600);
+  const t = $('toast'); t.textContent = msg; t.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = 'toast' + (isErr ? ' err' : ''), 2600);
 }
 
-// olaylar
+// ---- profil (branş/il) ----
+function fillSelect(el, items, placeholder) {
+  el.innerHTML = `<option value="">${placeholder}</option>` + items.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+}
+function openProfile() {
+  fillSelect($('pf-bransh'), BRANSLAR, 'Seçin...');
+  fillSelect($('pf-il'), ILLER, 'Seçin...');
+  if (profile) { $('pf-bransh').value = profile.bransh || ''; $('pf-il').value = profile.il || ''; }
+  $('profileModal').classList.add('show');
+}
+function closeProfile() { $('profileModal').classList.remove('show'); }
+async function saveProfile() {
+  profile = { bransh: $('pf-bransh').value || '', il: $('pf-il').value || '' };
+  localStorage.setItem('sbahbs_profile', JSON.stringify(profile));
+  closeProfile();
+  try { await rpc('register_participant', { p_client_id: clientId, p_bransh: profile.bransh, p_il: profile.il }); } catch (e) {}
+}
+
+// ---- başlat ----
+fillSelect($('moduleSel'), MODULES, 'Modül seç...');
+renderCatPick();
 $('addBtn').onclick = addIdea;
 $('newIdea').addEventListener('input', e => $('cc').textContent = e.target.value.length);
-$('newIdea').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea();
-});
+$('newIdea').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea(); });
+$('pf-save').onclick = saveProfile;
+$('pf-skip').onclick = () => { localStorage.setItem('sbahbs_profile_skipped', '1'); closeProfile(); };
 
-renderCatPick();
+// profil yoksa ve daha önce atlanmadıysa bir kez sor
+if (!profile && !localStorage.getItem('sbahbs_profile_skipped')) { setTimeout(openProfile, 600); }
+
 load();
 </script>
 </body>
