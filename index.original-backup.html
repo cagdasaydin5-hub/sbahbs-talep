@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBAHBS Önerileri</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #141412; --surface: #1e1d1b; --border: #2e2d2a; --border-hover: #3d3c38;
+    --text: #f0ede8; --muted: #8a8780; --accent: #3b82f6; --accent-light: #1e2d4a;
+    --accent-border: #1d4ed8; --green: #22c55e; --green-light: #0d2018; --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 660px; margin: 0 auto; }
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .page-header p { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .add-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .add-card label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+  .add-row { display: flex; gap: 8px; }
+  .add-row input { flex: 1; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 14px; background: var(--bg); color: var(--text); outline: none; }
+  .add-row input:focus { border-color: var(--accent); }
+  .add-row button { background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); padding: 10px 18px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+  .toolbar span { font-size: 13px; color: var(--muted); }
+  .sort-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: none; cursor: pointer; color: var(--muted); }
+  .sort-btn.active { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 14px; }
+  .vote-col { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+  .vote-btn { background: none; border: 1px solid var(--border); border-radius: 7px; width: 34px; height: 30px; cursor: pointer; color: var(--muted); font-size: 15px; }
+  .vote-btn.voted { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent); }
+  .vote-count { font-size: 15px; font-weight: 600; color: var(--text); min-width: 20px; text-align: center; }
+  .item-body { flex: 1; min-width: 0; }
+  .item-text { font-size: 14px; color: var(--text); line-height: 1.55; word-wrap: break-word; white-space: pre-wrap; }
+  .item-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: var(--green-light); color: var(--green); border: 1px solid currentColor; font-weight: 500; }
+  .status { text-align: center; color: var(--muted); font-size: 14px; padding: 2.5rem 1rem; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #f0ede8; color: #141412; font-size: 13px; padding: 10px 18px; border-radius: 8px; transition: transform 0.25s ease; z-index: 999; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page-header">
+    <h1>SBAHBS Önerileri</h1>
+    <p>Programda eksik gördüğün özellikleri ekle, beğendiklerine oy ver.</p>
+  </div>
+  <div class="add-card">
+    <label for="newIdea">Yeni öneri ekle</label>
+    <div class="add-row">
+      <input type="text" id="newIdea" placeholder="Önerinizi buraya yazın..." />
+      <button id="addBtn" onclick="addIdea()">+ Ekle</button>
+    </div>
+  </div>
+  <div class="toolbar">
+    <span>Sırala:</span>
+    <button class="sort-btn active" id="sb-votes" onclick="setSort('votes')">En çok oy</button>
+    <button class="sort-btn" id="sb-new" onclick="setSort('new')">En yeni</button>
+  </div>
+  <div class="list" id="list"><div class="status">Yükleniyor...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://vbobeqgambooxtfefxmd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZib2JlcWdhbWJvb3h0ZmVmeG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjY4MjUsImV4cCI6MjA5MzY0MjgyNX0.-JAFm0N2NrEcS9qX-S6t0lx0att63agcR_wWrio6sOE';
+const TABLE = 'ideas';
+let ideas = [];
+let myVotes = JSON.parse(localStorage.getItem('sbhabs_votes') || '{}');
+let sortMode = 'votes';
+
+async function apiFetch(path, opts = {}) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.headers.get('content-type')?.includes('json') ? r.json() : null;
+}
+
+// OTOMATİK TEMİZLİK (Kod kanadı)
+async function temizleEskiFikirler() {
+  const ikiGunOnce = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+  try {
+    await apiFetch(`ideas?votes=lte.1&created_at=lt.${ikiGunOnce}`, { method: 'DELETE' });
+  } catch (e) { console.log("Temizlik gerekmiyor."); }
+}
+
+async function load() {
+  await temizleEskiFikirler();
+  try {
+    ideas = await apiFetch(`${TABLE}?select=*`);
+    render();
+  } catch(e) {
+    document.getElementById('list').innerHTML = '<div class="status">Bağlantı hatası.</div>';
+  }
+}
+
+async function addIdea() {
+  const inp = document.getElementById('newIdea');
+  const text = inp.value.trim();
+  if (!text) return;
+  try {
+    const [item] = await apiFetch(TABLE, {
+      method: 'POST',
+      body: JSON.stringify({ text, votes: 1 }) 
+    });
+    ideas.push(item);
+    myVotes[item.id] = true;
+    saveVotes();
+    inp.value = '';
+    render();
+    showToast('Eklendi!');
+  } catch(e) { showToast('Hata oluştu'); }
+}
+
+async function vote(id) {
+  const item = ideas.find(i => i.id === id);
+  if (!item) return;
+  const wasVoted = !!myVotes[id];
+  let newVotes = wasVoted ? item.votes - 1 : item.votes + 1;
+  if (newVotes < 0) newVotes = 0; 
+  try {
+    await apiFetch(`${TABLE}?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ votes: newVotes })
+    });
+    item.votes = newVotes;
+    if (wasVoted) delete myVotes[id]; else myVotes[id] = true;
+    saveVotes();
+    render();
+  } catch(e) { showToast('Oy kaydedilemedi'); }
+}
+
+function saveVotes() { localStorage.setItem('sbhabs_votes', JSON.stringify(myVotes)); }
+function setSort(m) { sortMode = m; render(); }
+function getSorted() {
+  return [...ideas].sort((a, b) => sortMode === 'votes' ? b.votes - a.votes : new Date(b.created_at) - new Date(a.created_at));
+}
+function timeAgo(iso) {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60) return 'az önce';
+  if (diff < 3600) return Math.floor(diff/60) + ' dk önce';
+  return Math.floor(diff/3600) + ' sa önce';
+}
+function render() {
+  const list = document.getElementById('list');
+  const sorted = getSorted();
+  document.getElementById('sb-votes').className = 'sort-btn' + (sortMode === 'votes' ? ' active' : '');
+  document.getElementById('sb-new').className = 'sort-btn' + (sortMode === 'new' ? ' active' : '');
+  if (!sorted.length) { list.innerHTML = '<div class="status">Henüz öneri yok.</div>'; return; }
+  list.innerHTML = sorted.map((item, idx) => `
+    <div class="item">
+      <div class="vote-col">
+        <button class="vote-btn ${myVotes[item.id] ? 'voted' : ''}" onclick="vote(${item.id})">▲</button>
+        <span class="vote-count">${item.votes}</span>
+      </div>
+      <div class="item-body">
+        <div class="item-text">${item.text}</div>
+        <div class="item-meta">${timeAgo(item.created_at)}</div>
+      </div>
+      ${idx === 0 && sortMode === 'votes' ? '<span class="badge">🔥 En popüler</span>' : ''}
+    </div>
+  `).join('');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+document.getElementById('newIdea').addEventListener('keydown', e => { if (e.key === 'Enter') addIdea(); });
+load();
+</script>
+</body>
+</html>

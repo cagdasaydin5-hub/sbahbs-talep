@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBAHBS Geri Bildirim</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #141412; --surface: #1e1d1b; --surface-2: #25241f;
+    --border: #2e2d2a; --border-hover: #3d3c38;
+    --text: #f0ede8; --muted: #8a8780; --accent: #3b82f6;
+    --accent-light: #1e2d4a; --accent-border: #1d4ed8;
+    --radius: 14px; --radius-sm: 9px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    padding: 2rem 1rem 4rem; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .page-header { margin-bottom: 1.75rem; }
+  .page-header h1 { font-size: 23px; font-weight: 650; letter-spacing: -0.4px; }
+  .page-header p { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.65; }
+
+  .add-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;
+  }
+  .add-card .lbl { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 9px; }
+
+  .cat-pick { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+  .cat-opt {
+    font-size: 13px; padding: 7px 13px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    transition: all .12s ease; user-select: none;
+  }
+  .cat-opt:hover { border-color: var(--border-hover); }
+  .cat-opt.sel { color: #fff; font-weight: 500; }
+
+  textarea#newIdea {
+    width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; font-size: 14.5px; background: var(--bg); color: var(--text);
+    outline: none; resize: vertical; min-height: 78px; line-height: 1.55;
+    font-family: inherit;
+  }
+  textarea#newIdea:focus { border-color: var(--accent); }
+  .add-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 12px; }
+  .char-count { font-size: 12px; color: var(--muted); }
+  #addBtn {
+    background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm);
+    padding: 11px 22px; font-size: 14px; font-weight: 550; cursor: pointer; white-space: nowrap;
+    transition: opacity .12s;
+  }
+  #addBtn:hover { opacity: .9; }
+  #addBtn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-size: 12.5px; padding: 6px 13px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: none; color: var(--muted); transition: all .12s;
+  }
+  .chip:hover { border-color: var(--border-hover); }
+  .chip.active { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
+  .chip .n { opacity: .6; margin-left: 3px; }
+
+  .sort { display: flex; gap: 6px; align-items: center; }
+  .sort span { font-size: 12.5px; color: var(--muted); }
+  .sort-btn {
+    font-size: 12.5px; padding: 6px 12px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: none; color: var(--muted);
+  }
+  .sort-btn.active { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
+
+  .list { display: flex; flex-direction: column; gap: 9px; }
+  .item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1rem 1.15rem; display: flex; align-items: flex-start; gap: 14px;
+    transition: border-color .12s;
+  }
+  .item:hover { border-color: var(--border-hover); }
+  .vote-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 1px; }
+  .vote-btn {
+    background: none; border: 1px solid var(--border); border-radius: 8px;
+    width: 38px; height: 32px; cursor: pointer; color: var(--muted); font-size: 14px;
+    transition: all .12s;
+  }
+  .vote-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .vote-btn.voted { background: var(--accent-light); border-color: var(--accent-border); color: #93b4f7; }
+  .vote-count { font-size: 15px; font-weight: 650; color: var(--text); min-width: 22px; text-align: center; }
+  .item-body { flex: 1; min-width: 0; }
+  .item-text { font-size: 14.5px; color: var(--text); line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; }
+  .item-meta { display: flex; align-items: center; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
+  .cat-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 550; border: 1px solid; }
+  .time { font-size: 12px; color: var(--muted); }
+
+  .status { text-align: center; color: var(--muted); font-size: 14px; padding: 3rem 1rem; line-height: 1.6; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(90px);
+    background: #f0ede8; color: #141412; font-size: 13px; font-weight: 500;
+    padding: 11px 20px; border-radius: 9px; transition: transform .25s ease; z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.err { background: #4a1f1f; color: #ffd9d9; }
+
+  @media (max-width: 560px) {
+    body { padding: 1.25rem .85rem 3rem; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .add-foot { flex-direction: column; align-items: stretch; }
+    #addBtn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page-header">
+    <h1>SBAHBS Geri Bildirim</h1>
+    <p>SB-AHBS'de geliştirilmesini istediğin, kullanırken zorlandığın ya da hatalı bulduğun şeyleri yaz.
+       Aynı görüşü paylaşıyorsan oy ver — en çok oy alanlar önceliklendirilip ilgili birime iletilecek.</p>
+  </div>
+
+  <div class="add-card">
+    <span class="lbl">Geri bildirim türü</span>
+    <div class="cat-pick" id="catPick"></div>
+    <span class="lbl">Geri bildirimin</span>
+    <textarea id="newIdea" maxlength="500" placeholder="Örn: Reçete ekranında ilaç ararken sonuçlar çok yavaş geliyor..."></textarea>
+    <div class="add-foot">
+      <span class="char-count"><span id="cc">0</span>/500</span>
+      <button id="addBtn">Gönder</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filters" id="filters"></div>
+    <div class="sort">
+      <span>Sırala:</span>
+      <button class="sort-btn active" id="sb-votes">En çok oy</button>
+      <button class="sort-btn" id="sb-new">En yeni</button>
+    </div>
+  </div>
+
+  <div class="list" id="list"><div class="status">Yükleniyor...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== AYAR: yeni Supabase projesinin bilgileri buraya ======
+const SUPABASE_URL = 'https://vbobeqgambooxtfefxmd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZib2JlcWdhbWJvb3h0ZmVmeG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjY4MjUsImV4cCI6MjA5MzY0MjgyNX0.-JAFm0N2NrEcS9qX-S6t0lx0att63agcR_wWrio6sOE';
+// =============================================================
+
+// Kategoriler (gerekirse sadece buradan düzenle)
+const CATEGORIES = [
+  { label: 'Geliştirilmeli', color: '#3b82f6', bg: '#1e2d4a' },
+  { label: 'Kullanımı zor',  color: '#f59e0b', bg: '#3a2e12' },
+  { label: 'Bulması zor',    color: '#a855f7', bg: '#2e1f47' },
+  { label: 'Hata / Bug',     color: '#ef4444', bg: '#3a1a1a' },
+];
+const catOf = (l) => CATEGORIES.find(c => c.label === l) || CATEGORIES[0];
+
+let ideas = [];
+let myVotes = JSON.parse(localStorage.getItem('sbahbs_votes') || '{}');
+let sortMode = 'votes';
+let filterCat = 'all';
+let selectedCat = CATEGORIES[0].label;
+let sending = false;
+
+const $ = (id) => document.getElementById(id);
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+const baseHeaders = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json',
+};
+
+async function getIdeas() {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/ideas?select=*`, { headers: baseHeaders });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method: 'POST', headers: baseHeaders, body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function load() {
+  try {
+    ideas = await getIdeas();
+    render();
+  } catch (e) {
+    $('list').innerHTML = '<div class="status">Bağlantı hatası. Lütfen sayfayı yenileyin.</div>';
+  }
+}
+
+async function addIdea() {
+  if (sending) return;
+  const inp = $('newIdea');
+  const text = inp.value.trim();
+  if (text.length < 3) { showToast('Lütfen biraz daha açıklayıcı yaz', true); return; }
+  sending = true; $('addBtn').disabled = true;
+  try {
+    const item = await rpc('add_idea', { p_text: text, p_category: selectedCat });
+    ideas.push(item);
+    myVotes[item.id] = true;
+    saveVotes();
+    inp.value = ''; $('cc').textContent = '0';
+    render();
+    showToast('Teşekkürler, gönderildi!');
+  } catch (e) {
+    showToast('Gönderilemedi, tekrar deneyin', true);
+  } finally {
+    sending = false; $('addBtn').disabled = false;
+  }
+}
+
+async function vote(id) {
+  const item = ideas.find(i => i.id === id);
+  if (!item) return;
+  const wasVoted = !!myVotes[id];
+  const delta = wasVoted ? -1 : 1;
+  // iyimser güncelle
+  item.votes = Math.max(0, item.votes + delta);
+  if (wasVoted) delete myVotes[id]; else myVotes[id] = true;
+  saveVotes(); render();
+  try {
+    const newVotes = await rpc('vote_idea', { p_id: id, p_delta: delta });
+    if (typeof newVotes === 'number') { item.votes = newVotes; render(); }
+  } catch (e) {
+    // geri al
+    item.votes = Math.max(0, item.votes - delta);
+    if (wasVoted) myVotes[id] = true; else delete myVotes[id];
+    saveVotes(); render(); showToast('Oy kaydedilemedi', true);
+  }
+}
+
+function saveVotes() { localStorage.setItem('sbahbs_votes', JSON.stringify(myVotes)); }
+
+function visibleIdeas() {
+  let arr = filterCat === 'all' ? ideas : ideas.filter(i => i.category === filterCat);
+  return arr.slice().sort((a, b) => sortMode === 'votes'
+    ? (b.votes - a.votes) || (new Date(b.created_at) - new Date(a.created_at))
+    : new Date(b.created_at) - new Date(a.created_at));
+}
+
+function timeAgo(iso) {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60) return 'az önce';
+  if (diff < 3600) return Math.floor(diff / 60) + ' dk önce';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' sa önce';
+  return Math.floor(diff / 86400) + ' gün önce';
+}
+
+function renderCatPick() {
+  $('catPick').innerHTML = CATEGORIES.map(c =>
+    `<span class="cat-opt ${c.label === selectedCat ? 'sel' : ''}"
+       data-cat="${esc(c.label)}"
+       style="${c.label === selectedCat ? `background:${c.bg};border-color:${c.color};color:${c.color}` : ''}">
+       ${esc(c.label)}</span>`).join('');
+  document.querySelectorAll('#catPick .cat-opt').forEach(el =>
+    el.onclick = () => { selectedCat = el.dataset.cat; renderCatPick(); });
+}
+
+function renderFilters() {
+  const counts = {};
+  ideas.forEach(i => counts[i.category] = (counts[i.category] || 0) + 1);
+  const all = `<button class="chip ${filterCat === 'all' ? 'active' : ''}" data-f="all">Tümü <span class="n">${ideas.length}</span></button>`;
+  const rest = CATEGORIES.map(c =>
+    `<button class="chip ${filterCat === c.label ? 'active' : ''}" data-f="${esc(c.label)}">${esc(c.label)} <span class="n">${counts[c.label] || 0}</span></button>`).join('');
+  $('filters').innerHTML = all + rest;
+  document.querySelectorAll('#filters .chip').forEach(el =>
+    el.onclick = () => { filterCat = el.dataset.f; render(); });
+}
+
+function render() {
+  renderCatPick();
+  renderFilters();
+  $('sb-votes').className = 'sort-btn' + (sortMode === 'votes' ? ' active' : '');
+  $('sb-new').className = 'sort-btn' + (sortMode === 'new' ? ' active' : '');
+
+  const list = $('list');
+  const arr = visibleIdeas();
+  if (!arr.length) {
+    list.innerHTML = '<div class="status">Bu kategoride henüz geri bildirim yok.<br>İlk yazan sen ol 👆</div>';
+    return;
+  }
+  list.innerHTML = arr.map(item => {
+    const c = catOf(item.category);
+    return `
+    <div class="item">
+      <div class="vote-col">
+        <button class="vote-btn ${myVotes[item.id] ? 'voted' : ''}" data-id="${item.id}">▲</button>
+        <span class="vote-count">${item.votes}</span>
+      </div>
+      <div class="item-body">
+        <div class="item-text">${esc(item.text)}</div>
+        <div class="item-meta">
+          <span class="cat-badge" style="color:${c.color};background:${c.bg};border-color:${c.color}">${esc(item.category)}</span>
+          <span class="time">${timeAgo(item.created_at)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.vote-btn').forEach(el =>
+    el.onclick = () => vote(Number(el.dataset.id)));
+}
+
+let toastT;
+function showToast(msg, isErr) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.className = 'toast' + (isErr ? ' err' : ''), 2600);
+}
+
+// olaylar
+$('addBtn').onclick = addIdea;
+$('newIdea').addEventListener('input', e => $('cc').textContent = e.target.value.length);
+$('newIdea').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea();
+});
+
+renderCatPick();
+load();
+</script>
+</body>
+</html>
