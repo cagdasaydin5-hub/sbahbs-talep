@@ -134,6 +134,7 @@ function render(ideas, stats) {
   const catMap = groupBy(ideas, 'category');
   const modMap = groupBy(ideas, 'module');
   const branMap = groupBy(ideas, 'bransh');
+  const gecisMap = groupBy(ideas, 'gecis');
 
   const catSection = `<div class="section"><h2>Kategoriye göre</h2>${bars(catMap, { by: 'votes', color: l => CAT_COLORS[l] || '#8a8780' })}</div>`;
   const modSection = `<div class="section"><h2>Modüle / ekrana göre — sorun nerede yoğunlaşıyor?</h2>${bars(modMap, { by: 'votes', color: () => '#3b82f6' })}<div class="hint">Çubuklar oy sayısına göre; en uzun çubuk = en çok talep gören modül.</div></div>`;
@@ -156,6 +157,8 @@ function render(ideas, stats) {
 
   const branSection = (Object.keys(branMap).length && !(Object.keys(branMap).length === 1 && branMap['(belirtilmemiş)']))
     ? `<div class="section"><h2>Branşa göre (öneri verenler)</h2>${bars(branMap, { by: 'count', color: () => '#a855f7' })}</div>` : '';
+  const gecisSection = (Object.keys(gecisMap).length && !(Object.keys(gecisMap).length === 1 && gecisMap['(belirtilmemiş)']))
+    ? `<div class="section"><h2>SB-AHBS deneyim süresine göre (öneri verenler)</h2>${bars(gecisMap, { by: 'count', color: () => '#d6b25a' })}</div>` : '';
 
   const timeHint = withMin.length
     ? `<div class="section"><h2>Zaman kaybı tahmini</h2>
@@ -166,11 +169,11 @@ function render(ideas, stats) {
         Bu, katılan hekimlerin beyanına dayalı bir <b>tahmindir</b>; kesin ölçüm değildir. Sunumda "katılımcı beyanı" olarak belirtilmesi önerilir.</div>
       </div>` : '';
 
-  document.getElementById('content').innerHTML = cards + catSection + modSection + timeHint + topSection + branSection;
+  document.getElementById('content').innerHTML = cards + catSection + modSection + timeHint + topSection + branSection + gecisSection;
 }
 
 function toCSV(rows) {
-  const cols = ['id','category','module','votes','minutes','bransh','il','created_at','text'];
+  const cols = ['id','category','module','votes','minutes','bransh','il','gecis','created_at','text'];
   const head = cols.join(',');
   const esc = (v) => { v = (v == null ? '' : String(v)); return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const body = rows.map(r => cols.map(c => esc(r[c])).join(',')).join('\n');

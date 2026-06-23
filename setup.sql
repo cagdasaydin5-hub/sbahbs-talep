@@ -27,6 +27,7 @@ alter table public.ideas add column if not exists module     text;
 alter table public.ideas add column if not exists minutes    integer;   -- günlük tahmini zaman kaybı (dk)
 alter table public.ideas add column if not exists bransh     text;
 alter table public.ideas add column if not exists il         text;
+alter table public.ideas add column if not exists gecis      text;   -- SB-AHBS'ye geçiş süresi
 
 -- 3) Katılımcı tablosu (tarayıcı başına 1 kayıt -> kaç hekim / kaç il)
 create table if not exists public.participants (
@@ -34,8 +35,10 @@ create table if not exists public.participants (
   client_id  text unique not null,
   bransh     text,
   il         text,
+  gecis      text,
   created_at timestamptz not null default now()
 );
+alter table public.participants add column if not exists gecis text;
 
 -- 4) RLS
 alter table public.ideas        enable row level security;
@@ -50,10 +53,11 @@ create policy "ideas_select_anon" on public.ideas for select to anon using (true
 revoke insert, update, delete on public.ideas        from anon;
 revoke all                     on public.participants from anon;
 
--- 5) Öneri ekleme (yeni imza: module, minutes, bransh, il)
+-- 5) Öneri ekleme (imza: module, minutes, bransh, il, gecis)
 drop function if exists public.add_idea(text, text);
+drop function if exists public.add_idea(text, text, text, integer, text, text);
 create or replace function public.add_idea(
-  p_text text, p_category text, p_module text, p_minutes integer, p_bransh text, p_il text
+  p_text text, p_category text, p_module text, p_minutes integer, p_bransh text, p_il text, p_gecis text
 )
 returns public.ideas
 language plpgsql
@@ -65,7 +69,7 @@ begin
   if char_length(btrim(p_text)) < 3 then
     raise exception 'Metin çok kısa';
   end if;
-  insert into public.ideas (text, category, module, minutes, bransh, il, votes)
+  insert into public.ideas (text, category, module, minutes, bransh, il, gecis, votes)
   values (
     left(btrim(p_text), 500),
     coalesce(nullif(btrim(p_category), ''), 'Kolaylaştırılmalı'),
@@ -76,13 +80,14 @@ begin
          else p_minutes end,
     nullif(btrim(p_bransh), ''),
     nullif(btrim(p_il), ''),
+    nullif(btrim(p_gecis), ''),
     1
   )
   returning * into r;
   return r;
 end;
 $$;
-grant execute on function public.add_idea(text, text, text, integer, text, text) to anon;
+grant execute on function public.add_idea(text, text, text, integer, text, text, text) to anon;
 
 -- 6) Oylama (sadece votes; negatife düşmez)
 create or replace function public.vote_idea(p_id bigint, p_delta integer)
@@ -101,7 +106,8 @@ $$;
 grant execute on function public.vote_idea(bigint, integer) to anon;
 
 -- 7) Katılımcı kaydı (tarayıcı başına 1; upsert)
-create or replace function public.register_participant(p_client_id text, p_bransh text, p_il text)
+drop function if exists public.register_participant(text, text, text);
+create or replace function public.register_participant(p_client_id text, p_bransh text, p_il text, p_gecis text)
 returns void
 language plpgsql
 security definer
@@ -109,13 +115,13 @@ set search_path = public
 as $$
 begin
   if p_client_id is null or btrim(p_client_id) = '' then return; end if;
-  insert into public.participants (client_id, bransh, il)
-  values (btrim(p_client_id), nullif(btrim(p_bransh), ''), nullif(btrim(p_il), ''))
+  insert into public.participants (client_id, bransh, il, gecis)
+  values (btrim(p_client_id), nullif(btrim(p_bransh), ''), nullif(btrim(p_il), ''), nullif(btrim(p_gecis), ''))
   on conflict (client_id) do update
-    set bransh = excluded.bransh, il = excluded.il;
+    set bransh = excluded.bransh, il = excluded.il, gecis = excluded.gecis;
 end;
 $$;
-grant execute on function public.register_participant(text, text, text) to anon;
+grant execute on function public.register_participant(text, text, text, text) to anon;
 
 -- 8) Panel istatistikleri (kaç hekim / kaç il)
 create or replace function public.get_stats()
