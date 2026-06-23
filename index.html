@@ -372,6 +372,8 @@ $('addBtn').onclick = addIdea;
 $('newIdea').addEventListener('input', e => $('cc').textContent = e.target.value.length);
 $('newIdea').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea(); });
 $('pf-save').onclick = saveProfile;
+$('sb-votes').onclick = () => { sortMode = 'votes'; render(); };
+$('sb-new').onclick   = () => { sortMode = 'new';   render(); };
 
 // profil yoksa zorunlu olarak sor (atlanamaz; üçü de seçilmeden başlanmaz)
 if (!profile) openProfile();

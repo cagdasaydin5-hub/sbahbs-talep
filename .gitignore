@@ -3,3 +3,6 @@
 
 # Deploy klasörü (yalnız index.html + panel.html; kaynaktan kopyalanır)
 publish/
+
+# Kişisel Claude Code ayarları (commit'lenmez)
+.claude/settings.local.json
