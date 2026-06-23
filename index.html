@@ -100,6 +100,7 @@
   .modal-actions .ghost { background: none; color: var(--muted); }
   .modal-actions .ghost:hover { border-color: var(--border-hover); color: var(--text); }
   .modal-actions .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .modal-actions .primary:disabled { opacity: .45; cursor: not-allowed; }
 
   @media (max-width: 560px) {
     body { padding: 1.25rem .85rem 3rem; }
@@ -160,7 +161,7 @@
 <div class="overlay" id="profileModal">
   <div class="modal">
     <h2>Hoş geldin 👋</h2>
-    <p>Geri bildirimleri SB-AHBS proje yönetimine sunarken "kaç ilden, hangi branştan hekim" diyebilmemiz için iki kısa soru — yalnızca 1 kez.</p>
+    <p>Geri bildirimler SB-AHBS proje yönetimine sunulurken "kaç ilden, hangi branştan ve ne kadar deneyimli hekimler" diyebilmemiz için 3 kısa soru — yalnızca 1 kez, hepsi tek tık.</p>
     <label>Branş / görev</label>
     <div class="cat-pick" id="pf-bransh-pick"></div>
     <label for="pf-il">İl</label>
@@ -168,8 +169,7 @@
     <label>SB-AHBS'ye ne zaman geçtiniz?</label>
     <div class="cat-pick" id="pf-gecis-pick"></div>
     <div class="modal-actions">
-      <button class="ghost" id="pf-skip">Atla</button>
-      <button class="primary" id="pf-save">Kaydet</button>
+      <button class="primary" id="pf-save" disabled>Kaydet ve başla</button>
     </div>
   </div>
 </div>
@@ -350,14 +350,15 @@ function renderChips(cid, items, sel, onPick) {
     `<span class="cat-opt ${x === sel ? 'sel' : ''}" data-v="${esc(x)}" style="${x === sel ? 'background:var(--accent-light);border-color:var(--accent-border);color:#93b4f7' : ''}">${esc(x)}</span>`).join('');
   document.querySelectorAll('#' + cid + ' .cat-opt').forEach(el => el.onclick = () => onPick(el.dataset.v));
 }
-function renderBranshChips() { renderChips('pf-bransh-pick', BRANSLAR, pfBransh, v => { pfBransh = (pfBransh === v ? '' : v); renderBranshChips(); }); }
-function renderGecisChips()  { renderChips('pf-gecis-pick',  GECIS,    pfGecis,  v => { pfGecis  = (pfGecis  === v ? '' : v); renderGecisChips();  }); }
+function updateSaveBtn() { $('pf-save').disabled = !(pfBransh && $('pf-il').value && pfGecis); }
+function renderBranshChips() { renderChips('pf-bransh-pick', BRANSLAR, pfBransh, v => { pfBransh = (pfBransh === v ? '' : v); renderBranshChips(); updateSaveBtn(); }); }
+function renderGecisChips()  { renderChips('pf-gecis-pick',  GECIS,    pfGecis,  v => { pfGecis  = (pfGecis  === v ? '' : v); renderGecisChips();  updateSaveBtn(); }); }
 function openProfile() {
   fillSelect($('pf-il'), ILLER, 'Seçin...');
   pfBransh = profile ? (profile.bransh || '') : '';
   pfGecis  = profile ? (profile.gecis  || '') : '';
   if (profile) $('pf-il').value = profile.il || '';
-  renderBranshChips(); renderGecisChips();
+  renderBranshChips(); renderGecisChips(); updateSaveBtn();
   $('profileModal').classList.add('show');
 }
 function closeProfile() { $('profileModal').classList.remove('show'); }
@@ -375,10 +376,10 @@ $('addBtn').onclick = addIdea;
 $('newIdea').addEventListener('input', e => $('cc').textContent = e.target.value.length);
 $('newIdea').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addIdea(); });
 $('pf-save').onclick = saveProfile;
-$('pf-skip').onclick = () => { localStorage.setItem('sbahbs_profile_skipped', '1'); closeProfile(); };
+$('pf-il').addEventListener('change', updateSaveBtn);
 
-// profil yoksa ve daha önce atlanmadıysa bir kez sor
-if (!profile && !localStorage.getItem('sbahbs_profile_skipped')) { setTimeout(openProfile, 600); }
+// profil yoksa zorunlu olarak sor (atlanamaz; üçü de seçilmeden başlanmaz)
+if (!profile) openProfile();
 
 load();
 </script>
