@@ -1,13 +1,15 @@
 -- =====================================================================
---  SBAHBS Geri Bildirim — Supabase kurulum / güncelleme script'i (v2)
+--  SBAHBS Geri Bildirim — Supabase kurulum / güncelleme script'i (v3)
 --  Çalıştırma:  Supabase paneli -> SQL Editor -> bu dosyayı yapıştır -> Run
 --  (vbobeqgambooxtfefxmd projesi)
 -- =====================================================================
 --  GÜVENLE TEKRAR ÇALIŞTIRILABİLİR. Mevcut veriyi silmez; eksikleri ekler:
---   * ideas tablosuna: module, minutes (günlük tahmini dk), bransh, il
+--   * ideas tablosuna: module, minutes (günlük tahmini dk), bransh, il, weighted_votes
 --   * participants tablosu (kaç hekim / kaç il katıldı)
---   * Güvenli fonksiyonlar: add_idea, vote_idea, register_participant, get_stats
+--   * Deneyim çarpanı: oylar SB-AHBS deneyimine göre ağırlıklanır (gecis_weight: 1/2/3/4)
+--   * Güvenli fonksiyonlar: add_idea, vote_idea(+gecis), register_participant, get_stats
 --   * Doğrudan yazma/silme KAPALI (yalnız fonksiyonlarla)
+--  v3 NOT: vote_idea imzası değişti (p_gecis eklendi) -> bu script yeniden çalıştırılmalı.
 -- =====================================================================
 
 -- 1) ideas tablosu (yoksa oluştur)
@@ -28,6 +30,9 @@ alter table public.ideas add column if not exists minutes    integer;   -- günl
 alter table public.ideas add column if not exists bransh     text;
 alter table public.ideas add column if not exists il         text;
 alter table public.ideas add column if not exists gecis      text;   -- SB-AHBS'ye geçiş süresi
+alter table public.ideas add column if not exists weighted_votes numeric not null default 0;  -- deneyim-ağırlıklı oy skoru (1/2/3/4 çarpan)
+-- eski (ağırlıksız) satırlar için tek seferlik geri-doldurma: hiç ağırlık yoksa ham oyu baz al
+update public.ideas set weighted_votes = votes where weighted_votes = 0 and votes > 0;
 
 -- 3) Katılımcı tablosu (tarayıcı başına 1 kayıt -> kaç hekim / kaç il)
 create table if not exists public.participants (
@@ -53,6 +58,22 @@ create policy "ideas_select_anon" on public.ideas for select to anon using (true
 revoke insert, update, delete on public.ideas        from anon;
 revoke all                     on public.participants from anon;
 
+-- 4b) Deneyim çarpanı: SB-AHBS'ye geçiş süresine göre oy ağırlığı (1 / 2 / 3 / 4)
+create or replace function public.gecis_weight(p_gecis text)
+returns numeric
+language sql
+immutable
+set search_path = public
+as $$
+  select case btrim(coalesce(p_gecis, ''))
+    when 'Element''ten geçtim' then 4
+    when '3-6 ay'              then 3
+    when '1-3 ay'              then 2
+    when '1 ay içinde'         then 1
+    else 1
+  end;
+$$;
+
 -- 5) Öneri ekleme (imza: module, minutes, bransh, il, gecis)
 drop function if exists public.add_idea(text, text);
 drop function if exists public.add_idea(text, text, text, integer, text, text);
@@ -69,7 +90,7 @@ begin
   if char_length(btrim(p_text)) < 3 then
     raise exception 'Metin çok kısa';
   end if;
-  insert into public.ideas (text, category, module, minutes, bransh, il, gecis, votes)
+  insert into public.ideas (text, category, module, minutes, bransh, il, gecis, votes, weighted_votes)
   values (
     left(btrim(p_text), 500),
     coalesce(nullif(btrim(p_category), ''), 'Kolaylaştırılmalı'),
@@ -81,7 +102,8 @@ begin
     nullif(btrim(p_bransh), ''),
     nullif(btrim(p_il), ''),
     nullif(btrim(p_gecis), ''),
-    1
+    1,
+    public.gecis_weight(p_gecis)   -- yazar otomatik oy verir; ağırlığı kendi deneyimi kadar
   )
   returning * into r;
   return r;
@@ -89,21 +111,26 @@ end;
 $$;
 grant execute on function public.add_idea(text, text, text, integer, text, text, text) to anon;
 
--- 6) Oylama (sadece votes; negatife düşmez)
-create or replace function public.vote_idea(p_id bigint, p_delta integer)
+-- 6) Oylama (ham oy + deneyim-ağırlıklı skor; negatife düşmez)
+drop function if exists public.vote_idea(bigint, integer);
+create or replace function public.vote_idea(p_id bigint, p_delta integer, p_gecis text)
 returns integer
 language plpgsql
 security definer
 set search_path = public
 as $$
-declare v integer;
+declare v integer; w numeric;
 begin
-  update public.ideas set votes = greatest(0, votes + p_delta)
-   where id = p_id returning votes into v;
+  w := public.gecis_weight(p_gecis);
+  update public.ideas
+     set votes          = greatest(0, votes + p_delta),
+         weighted_votes = greatest(0, weighted_votes + (p_delta * w))
+   where id = p_id
+   returning votes into v;
   return v;
 end;
 $$;
-grant execute on function public.vote_idea(bigint, integer) to anon;
+grant execute on function public.vote_idea(bigint, integer, text) to anon;
 
 -- 7) Katılımcı kaydı (tarayıcı başına 1; upsert)
 drop function if exists public.register_participant(text, text, text);
@@ -133,7 +160,13 @@ as $$
   select json_build_object(
     'participants',  (select count(*) from public.participants),
     'participant_cities', (select count(distinct il) from public.participants where il is not null and il <> ''),
-    'idea_cities',   (select count(distinct il) from public.ideas where il is not null and il <> '')
+    'idea_cities',   (select count(distinct il) from public.ideas where il is not null and il <> ''),
+    'participant_gecis',  (select coalesce(json_object_agg(g, c), '{}'::json)
+                             from (select coalesce(nullif(btrim(gecis), ''), '(belirtilmemiş)') g, count(*) c
+                                     from public.participants group by 1) s),
+    'participant_bransh', (select coalesce(json_object_agg(g, c), '{}'::json)
+                             from (select coalesce(nullif(btrim(bransh), ''), '(belirtilmemiş)') g, count(*) c
+                                     from public.participants group by 1) s)
   );
 $$;
 grant execute on function public.get_stats() to anon;

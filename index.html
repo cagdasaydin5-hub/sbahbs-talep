@@ -260,7 +260,7 @@ async function vote(id) {
   if (wasVoted) delete myVotes[id]; else myVotes[id] = true;
   saveVotes(); render();
   try {
-    const nv = await rpc('vote_idea', { p_id: id, p_delta: delta });
+    const nv = await rpc('vote_idea', { p_id: id, p_delta: delta, p_gecis: profile ? profile.gecis : null });
     if (typeof nv === 'number') { item.votes = nv; render(); }
   } catch (e) {
     item.votes = Math.max(0, item.votes - delta);

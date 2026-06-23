@@ -1,0 +1,5 @@
+# Netlify CLI artıkları (deploy state — repoya girmesin)
+.netlify/
+
+# Deploy klasörü (yalnız index.html + panel.html; kaynaktan kopyalanır)
+publish/
