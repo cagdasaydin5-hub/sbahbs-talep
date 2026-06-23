@@ -161,12 +161,12 @@
   <div class="modal">
     <h2>Hoş geldin 👋</h2>
     <p>Geri bildirimleri SB-AHBS proje yönetimine sunarken "kaç ilden, hangi branştan hekim" diyebilmemiz için iki kısa soru — yalnızca 1 kez.</p>
-    <label for="pf-bransh">Branş / görev</label>
-    <select id="pf-bransh"></select>
+    <label>Branş / görev</label>
+    <div class="cat-pick" id="pf-bransh-pick"></div>
     <label for="pf-il">İl</label>
     <select id="pf-il"></select>
-    <label for="pf-gecis">SB-AHBS'ye ne zaman geçtiniz?</label>
-    <select id="pf-gecis"></select>
+    <label>SB-AHBS'ye ne zaman geçtiniz?</label>
+    <div class="cat-pick" id="pf-gecis-pick"></div>
     <div class="modal-actions">
       <button class="ghost" id="pf-skip">Atla</button>
       <button class="primary" id="pf-save">Kaydet</button>
@@ -344,16 +344,25 @@ function showToast(msg, isErr) {
 function fillSelect(el, items, placeholder) {
   el.innerHTML = `<option value="">${placeholder}</option>` + items.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
 }
+let pfBransh = '', pfGecis = '';
+function renderChips(cid, items, sel, onPick) {
+  $(cid).innerHTML = items.map(x =>
+    `<span class="cat-opt ${x === sel ? 'sel' : ''}" data-v="${esc(x)}" style="${x === sel ? 'background:var(--accent-light);border-color:var(--accent-border);color:#93b4f7' : ''}">${esc(x)}</span>`).join('');
+  document.querySelectorAll('#' + cid + ' .cat-opt').forEach(el => el.onclick = () => onPick(el.dataset.v));
+}
+function renderBranshChips() { renderChips('pf-bransh-pick', BRANSLAR, pfBransh, v => { pfBransh = (pfBransh === v ? '' : v); renderBranshChips(); }); }
+function renderGecisChips()  { renderChips('pf-gecis-pick',  GECIS,    pfGecis,  v => { pfGecis  = (pfGecis  === v ? '' : v); renderGecisChips();  }); }
 function openProfile() {
-  fillSelect($('pf-bransh'), BRANSLAR, 'Seçin...');
   fillSelect($('pf-il'), ILLER, 'Seçin...');
-  fillSelect($('pf-gecis'), GECIS, 'Seçin...');
-  if (profile) { $('pf-bransh').value = profile.bransh || ''; $('pf-il').value = profile.il || ''; $('pf-gecis').value = profile.gecis || ''; }
+  pfBransh = profile ? (profile.bransh || '') : '';
+  pfGecis  = profile ? (profile.gecis  || '') : '';
+  if (profile) $('pf-il').value = profile.il || '';
+  renderBranshChips(); renderGecisChips();
   $('profileModal').classList.add('show');
 }
 function closeProfile() { $('profileModal').classList.remove('show'); }
 async function saveProfile() {
-  profile = { bransh: $('pf-bransh').value || '', il: $('pf-il').value || '', gecis: $('pf-gecis').value || '' };
+  profile = { bransh: pfBransh, il: $('pf-il').value || '', gecis: pfGecis };
   localStorage.setItem('sbahbs_profile', JSON.stringify(profile));
   closeProfile();
   try { await rpc('register_participant', { p_client_id: clientId, p_bransh: profile.bransh, p_il: profile.il, p_gecis: profile.gecis }); } catch (e) {}
