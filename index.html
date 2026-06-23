@@ -129,7 +129,7 @@
     <span class="lbl">Geri bildirim türü</span>
     <div class="cat-pick" id="catPick"></div>
     <span class="lbl">Geri bildirimin</span>
-    <textarea id="newIdea" maxlength="500" placeholder="Örn: Reçete ekranında ilaç ararken sonuçlar çok yavaş geliyor..."></textarea>
+    <textarea id="newIdea" maxlength="500" placeholder="Örn: Hasta adı veya TC yazmaya başlayınca arama otomatik daralsın, Enter'a basmaya gerek kalmasın (en az 3 hane)..."></textarea>
     <div class="add-foot">
       <span class="char-count"><span id="cc">0</span>/500</span>
       <button id="addBtn">Gönder</button>
@@ -157,10 +157,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // Kategoriler (gerekirse sadece buradan düzenle)
 const CATEGORIES = [
-  { label: 'Geliştirilmeli', color: '#3b82f6', bg: '#1e2d4a' },
-  { label: 'Kullanımı zor',  color: '#f59e0b', bg: '#3a2e12' },
-  { label: 'Bulması zor',    color: '#a855f7', bg: '#2e1f47' },
-  { label: 'Hata / Bug',     color: '#ef4444', bg: '#3a1a1a' },
+  { label: 'Kolaylaştırılmalı',  color: '#3b82f6', bg: '#1e2d4a' },
+  { label: 'Yavaş / Performans', color: '#f59e0b', bg: '#3a2e12' },
+  { label: 'Bulması zor',        color: '#a855f7', bg: '#2e1f47' },
+  { label: 'Eksik özellik',      color: '#22c55e', bg: '#0d2018' },
+  { label: 'Hata / Bug',         color: '#ef4444', bg: '#3a1a1a' },
 ];
 const catOf = (l) => CATEGORIES.find(c => c.label === l) || CATEGORIES[0];
 

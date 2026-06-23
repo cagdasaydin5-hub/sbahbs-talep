@@ -14,13 +14,13 @@
 create table if not exists public.ideas (
   id         bigint generated always as identity primary key,
   text       text        not null,
-  category   text        not null default 'Geliştirilmeli',
+  category   text        not null default 'Kolaylaştırılmalı',
   votes      integer     not null default 0,
   created_at timestamptz not null default now()
 );
 
 -- 2) Eksik kolonları tamamla (eski tablo için)
-alter table public.ideas add column if not exists category   text        not null default 'Geliştirilmeli';
+alter table public.ideas add column if not exists category   text        not null default 'Kolaylaştırılmalı';
 alter table public.ideas add column if not exists votes      integer     not null default 0;
 alter table public.ideas add column if not exists created_at timestamptz not null default now();
 
@@ -53,7 +53,7 @@ begin
   insert into public.ideas (text, category, votes)
   values (
     left(btrim(p_text), 500),
-    coalesce(nullif(btrim(p_category), ''), 'Geliştirilmeli'),
+    coalesce(nullif(btrim(p_category), ''), 'Kolaylaştırılmalı'),
     1
   )
   returning * into r;
